@@ -22,13 +22,25 @@ public @interface Cache {
     int expire();
 
     /**
-     * 自定义缓存Key，支持Spring EL表达式
+     * 动态获取缓存过期时间的表达式
+     * @return 时间
+     */
+    String expireExpression() default "";
+
+    /**
+     * 预警自动刷新时间(单位：秒)，必须满足 0 &lt; alarmTime &lt; expire才有效 当缓存在alarmTime 时间内即将过期的话，会自动刷新缓存内容；
+     * @return 时间
+     */
+    int alarmTime() default 0;
+
+    /**
+     * 自定义缓存Key，支持表达式
      * @return String 自定义缓存Key
      */
     String key();
 
     /**
-     * 设置哈希表中的字段，如果设置此项，则用哈希表进行存储，支持Spring EL表达式
+     * 设置哈希表中的字段，如果设置此项，则用哈希表进行存储，支持表达式
      * @return String
      */
     String hfield() default "";
@@ -40,8 +52,8 @@ public @interface Cache {
     boolean autoload() default false;
 
     /**
-     * 自动缓存的条件，可以为空，使用 SpEL 编写，返回 true 或者 false，如果设置了此值，autoload() 就失效，例如：null != #args[0].keyword，当第一个参数的keyword属性为null时设置为自动加载。
-     * @return String SpEL表达式
+     * 自动缓存的条件，可以为空，返回 true 或者 false，如果设置了此值，autoload() 就失效，例如：null != #args[0].keyword，当第一个参数的keyword属性为null时设置为自动加载。
+     * @return String 表达式
      */
     String autoloadCondition() default "";
 
@@ -52,7 +64,7 @@ public @interface Cache {
     long requestTimeout() default 36000L;
 
     /**
-     * 缓存的条件，可以为空，使用 SpEL 编写，返回 true 或者 false，只有为 true 才进行缓存
+     * 缓存的条件表达式，可以为空，返回 true 或者 false，只有为 true 才进行缓存
      * @return String
      */
     String condition() default "";
@@ -71,7 +83,8 @@ public @interface Cache {
 
     /**
      * 扩展缓存
-     * @return
+     * @return ExCache[]
      */
-    ExCache[] exCache() default @ExCache(expire=-1, key="");
+    ExCache[] exCache() default @ExCache(expire=-1, key="")
+    ;
 }

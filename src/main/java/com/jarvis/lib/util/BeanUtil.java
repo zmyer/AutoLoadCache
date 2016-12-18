@@ -5,6 +5,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
@@ -12,8 +13,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
-
-import com.jarvis.cache.serializer.ISerializer;
 
 /**
  * @author jiayu.qiu
@@ -28,10 +27,10 @@ public class BeanUtil {
      * @param obj Object
      * @return boolean true or false
      */
-    private static boolean isPrimitive(Object obj) {
-        return obj.getClass().isPrimitive() || obj instanceof String || obj instanceof Integer || obj instanceof Long
-            || obj instanceof Byte || obj instanceof Character || obj instanceof Boolean || obj instanceof Short
-            || obj instanceof Float || obj instanceof Double || obj instanceof BigDecimal;
+    public static boolean isPrimitive(Object obj) {
+        boolean rv=obj.getClass().isPrimitive() || obj instanceof String || obj instanceof Integer || obj instanceof Long || obj instanceof Byte || obj instanceof Character || obj instanceof Boolean
+            || obj instanceof Short || obj instanceof Float || obj instanceof Double || obj instanceof BigDecimal || obj instanceof BigInteger;
+        return rv;
     }
 
     /**
@@ -82,14 +81,14 @@ public class BeanUtil {
             Iterator it=tempMap.entrySet().iterator();
             while(it.hasNext()) {
                 Map.Entry entry=(Entry)it.next();
-                if(it.hasNext()) {
-                    r+=",";
-                }
                 Object key=entry.getKey();
                 r+=toString(key);
                 r+="=";
                 Object val=entry.getValue();
                 r+=toString(val);
+                if(it.hasNext()) {
+                    r+=",";
+                }
             }
             return r + "}";
         } else if(obj instanceof Class) {
@@ -138,15 +137,4 @@ public class BeanUtil {
         return r;
     }
 
-    /**
-     * 通过序列化进行深度复制
-     * @param obj Object
-     * @param serializer ISerializer
-     * @throws Exception Exception
-     * @return T Value 返回值
-     * @param <T> 泛型
-     */
-    public static <T> T deepClone(T obj, ISerializer<T> serializer) throws Exception {
-        return serializer.deserialize(serializer.serialize(obj));
-    }
 }
